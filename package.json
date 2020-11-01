@@ -1,0 +1,19 @@
+{
+  "name": "siham.egb.final",
+  "version": "1.0.0",
+  "description": "final project bootcamp",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sihamEgb/bootcamp_final_back.git"
+  },
+  "author": "Siham Egbaria",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sihamEgb/bootcamp_final_back/issues"
+  },
+  "homepage": "https://github.com/sihamEgb/bootcamp_final_back#readme"
+}
