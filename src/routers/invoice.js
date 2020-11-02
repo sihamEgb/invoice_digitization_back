@@ -30,7 +30,7 @@ router.get("/invoices/:id", auth, async (req, res) => {
 
     res.send(invoice);
   } catch (e) {
-    res.status(500).send();
+    res.status(500).send(e);
   }
 });
 

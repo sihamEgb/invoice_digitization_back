@@ -1,8 +1,6 @@
 const express = require("express");
 const multer = require("multer");
 const sharp = require("sharp");
-
-// const uuid = require("uuid");
 const User = require("../models/user");
 const auth = require("../middleware/auth");
 
@@ -77,7 +75,7 @@ router.get("/users/me", auth, async (req, res) => {
 });
 
 // update user by id
-router.patch("/usrs/me", auth, async (req, res) => {
+router.patch("/users/me", auth, async (req, res) => {
   const updates = Object.keys(req.body);
   const allowedUpdates = ["name", "email", "password", "age"];
   const isValidOperation = updates.every((update) =>
