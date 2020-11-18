@@ -1,9 +1,7 @@
 const express = require("express");
-const router = express.Router();
-const uuid = require("uuid");
 const auth = require("../middleware/auth");
-let invoices = require("../invoiceData");
 const Invoice = require("../models/invoice");
+const router = express.Router();
 
 // create new invoice
 router.post("/invoices", auth, async (req, res) => {
@@ -11,6 +9,7 @@ router.post("/invoices", auth, async (req, res) => {
     ...req.body,
     owner: req.user._id,
   });
+
   try {
     await invoice.save();
     res.status(201).send(invoice);
@@ -44,9 +43,7 @@ router.get("/invoices", auth, async (req, res) => {
 
 // update invoice by id + owner
 
-router.patch('tasks/:id',auth, async (req,res)=>{
-
-})
+router.patch("tasks/:id", auth, async (req, res) => {});
 // GET /invoice?store=zara
 //?limit=10&skip=20
 // sortBy=createdAt:desc
@@ -81,19 +78,17 @@ router.patch('tasks/:id',auth, async (req,res)=>{
 //   }
 // });
 
-
 // delete invoice id
-router.delete("/invoices/:id", auth,(req, res) => {
-	tru{
-		const invoice = await Invoice
-	}
-	const found = invoices.find((item) => item.id === req.params.id);
+router.delete("/invoices/:id", auth, (req, res) => {
+  // try{
+  // 	const invoice = await Invoice
+  // }
+  const found = invoices.find((item) => item.id === req.params.id);
   if (!found) {
     return res.sendStatus(400);
   }
 
   res.json(invoices);
 });
-
 
 module.exports = router;
