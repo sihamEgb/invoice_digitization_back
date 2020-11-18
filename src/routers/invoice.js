@@ -17,78 +17,112 @@ router.post("/invoices", auth, async (req, res) => {
     res.status(400).send(e);
   }
 });
-
-// get invoice by id (by owner)
-router.get("/invoices/:id/", auth, async (req, res) => {
+// get invoice by id
+router.get("/invoices/:id", auth, async (req, res) => {
   const _id = req.params.id;
+
   try {
     const invoice = await Invoice.findOne({ _id, owner: req.user._id });
+
     if (!invoice) {
-      return res.status(404).send(invoice);
+      return res.status(404).send();
     }
+
+    res.send(invoice);
+  } catch (e) {
+    res.status(500).send();
+  }
+});
+
+// update an invoice
+router.patch("/invoices/:id", auth, async (req, res) => {
+  const updates = Object.keys(req.body);
+  const allowedUpdates = [
+    "description",
+    "store",
+    "category",
+    "amount",
+    "paymentMethod",
+    "status",
+  ];
+  const isValidOperation = updates.every((update) =>
+    allowedUpdates.includes(update)
+  );
+
+  if (!isValidOperation) {
+    return res.status(400).send({ error: "Invalid updates!" });
+  }
+
+  try {
+    const invoice = await Invoice.findOne({
+      _id: req.params.id,
+      owner: req.user._id,
+    });
+
+    if (!invoice) {
+      return res.status(404).send();
+    }
+
+    updates.forEach((update) => (invoice[update] = req.body[update]));
+    await invoice.save();
+    res.send(invoice);
   } catch (e) {
     res.status(400).send(e);
   }
 });
 
-// get all invoices
-router.get("/invoices", auth, async (req, res) => {
+// delete invoice
+router.delete("/invoices/:id", auth, async (req, res) => {
   try {
-    await req.user.populate("invoices").execPopulate();
-    res.send(req.user.invoices);
+    const invoice = await Invoice.findOneAndDelete({
+      _id: req.params.id,
+      owner: req.user._id,
+    });
+
+    if (!invoice) {
+      res.status(404).send();
+    }
+
+    res.send(invoice);
   } catch (e) {
-    res.status(500).send(e);
+    res.status(500).send();
   }
 });
 
-// update invoice by id + owner
+// GET /invoices?category=name
+// GET /invoices?limit=10&skip=20
+// GET /invoices?sortBy=createdAt:desc
+router.get("/invoices", auth, async (req, res) => {
+  const match = {};
+  const sort = {};
 
-router.patch("tasks/:id", auth, async (req, res) => {});
-// GET /invoice?store=zara
-//?limit=10&skip=20
-// sortBy=createdAt:desc
-// -1 desc 1 asce
-// router.get("/invoices", auth, async (req, res) => {
-//   const match = {};
-//   const sort = {};
-
-//   if (req.query.completed) {
-//     // need to convert to boolean
-//     match.completed = req.query.completed === "true";
-//   }
-//   if (req.query.sortBy) {
-//     const parts = req.query.sortBy;
-//   }
-//   try {
-//     await req.users
-//       .populate({
-//         path: "invoice",
-//         match,
-//         options: {
-//           limit: parseInt(req.query.limit),
-//           skip: parseInt(req.query.skip),
-//           sort: {
-//             createdAt: -1,
-//           },
-//         },
-//       })
-//       .execPopulate();
-//   } catch (e) {
-//     res.status(500).send();
-//   }
-// });
-
-// delete invoice id
-router.delete("/invoices/:id", auth, (req, res) => {
-  // try{
-  // 	const invoice = await Invoice
-  // }
-  const found = invoices.find((item) => item.id === req.params.id);
-  if (!found) {
-    return res.sendStatus(400);
+  // fix this
+  // get all results from this category
+  if (req.query.category) {
+    match.category = req.query.category === "true";
   }
 
-  res.json(invoices);
+  if (req.query.sortBy) {
+    const parts = req.query.sortBy.split(":");
+    sort[parts[0]] = parts[1] === "desc" ? -1 : 1;
+  }
+
+  try {
+    await req.user
+      .populate({
+        path: "invoices",
+        match,
+        options: {
+          limit: parseInt(req.query.limit),
+          skip: parseInt(req.query.skip),
+          sort,
+        },
+      })
+      .execPopulate();
+    res.send(req.user.invoices);
+  } catch (e) {
+    res.status(500).send();
+  }
 });
 
 module.exports = router;
