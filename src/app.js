@@ -1,12 +1,12 @@
 const express = require("express");
 require("./db/mongoose");
 const userRouter = require("./routers/user");
-const taskRouter = require("./routers/task");
+const invoiceRouter = require("./routers/invoice");
 
 const app = express();
 
 app.use(express.json());
 app.use(userRouter);
-app.use(taskRouter);
+app.use(invoiceRouter);
 
 module.exports = app;
